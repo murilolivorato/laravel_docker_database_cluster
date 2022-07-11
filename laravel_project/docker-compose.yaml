@@ -1,0 +1,56 @@
+version: "3.9"
+networks:
+  database_cluster:
+    driver: bridge
+  laravel_project:
+services:
+  server:
+    # image: 'nginx:stable-alpine'
+    build:
+      context: .
+      dockerfile: dockerfiles/nginx.dockerfile
+    restart: unless-stopped
+    ports:
+      - "8089:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+      - database_cluster
+      - laravel_project
+    container_name: laravel_project_server
+    networks:
+      - laravel_project
+      - database_cluster
+  php:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    container_name: php_parametros_server
+    volumes:
+      - ./src:/var/www/html:delegated
+    ports:
+      - 8088:9000
+    networks:
+      - laravel_project
+      - database_cluster
+  composer:
+    build:
+      context: ./dockerfiles
+      dockerfile: composer.dockerfile
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - php
+    networks:
+      - laravel_project
+  artisan:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    volumes:
+      - ./src:/var/www/html
+    entrypoint: ["php", "/var/www/html/artisan"]
+    networks:
+      - laravel_project
