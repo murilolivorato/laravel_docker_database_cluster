@@ -1,7 +1,7 @@
 version: "3.9"
 networks:
-  defalt:
-    name: database_cluster
+  default:
+    name: laravel_db_cluster
 services:
   mysql:
     image: mysql:8.0.1
