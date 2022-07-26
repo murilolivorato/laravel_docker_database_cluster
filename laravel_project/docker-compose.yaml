@@ -1,7 +1,8 @@
 version: "3.9"
 networks:
-  default:
-    name: laravel_db_cluster
+  database_cluster:
+    driver: bridge
+  laravel_project:
 services:
   server:
     # image: 'nginx:stable-alpine'
@@ -17,6 +18,9 @@ services:
     depends_on:
       - php
     container_name: laravel_project_server
+    networks:
+      - database_cluster
+      - laravel_project
   php:
     build:
       context: .
@@ -26,6 +30,9 @@ services:
       - ./src:/var/www/html:delegated
     ports:
       - 8088:9000
+    networks:
+      - database_cluster
+      - laravel_project
   composer:
     build:
       context: ./dockerfiles

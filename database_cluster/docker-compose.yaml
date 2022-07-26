@@ -1,7 +1,6 @@
 version: "3.9"
 networks:
-  default:
-    name: laravel_db_cluster
+  database_cluster:
 services:
   mysql:
     image: mysql:8.0.1
@@ -12,6 +11,8 @@ services:
       - ./env/mysql.env
     ports:
       - 3306:3306
+    networks:
+      - database_cluster
     volumes:
       - /opt/mysql_data_cluster:/var/lib/mysql
   phpmyadmin:
@@ -26,3 +27,5 @@ services:
       - PMA_HOST=mysql
       - PMA_USER=root
       - PMA_PASSWORD=secret
+    networks:
+      - database_cluster
